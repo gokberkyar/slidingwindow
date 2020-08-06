@@ -4,6 +4,8 @@ from .Batching import batchWindows
 import numpy as np
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
+from tensorflow.nn import max_pool2d
+from tensorflow.keras.layers import AveragePooling2D
 
 def mergeWindows(data, dimOrder, maxWindowSize, overlapPercent, batchSize, transform, progressCallback = None):
 	"""
@@ -67,13 +69,16 @@ def mergeWindows(data, dimOrder, maxWindowSize, overlapPercent, batchSize, trans
 	return sums
 
 def myTransform(path,batch):
-	print("path--->",path)
+	#print("path--->",path)
 	#print("batch shape ---->",batch.shape)
-	print("batch ---> " ,batch)
+	#print("batch ---> " ,batch)
 	data = load_img(path)
 	data = img_to_array(data)
+	#data = max_pool2d(np.array([data]),4,4,"VALID")[0]
+	#avg  = AveragePooling2D(pool_size=(2,2),strides=4)
+	#data = avg(np.array([data]))[0]
 	#here need to load image
-	print("dataShape --->",data.shape)
+	#print("dataShape --->",data.shape)
 	#transformed = batch.apply(data)
 	# Do something meaningful with each window of the data here
 
@@ -113,8 +118,8 @@ def myMergeWindows(data,  maxWindowSize, overlapPercent,basePathForImg, batchSiz
 	resultDimensions = exemplarResult.shape[ len(exemplarResult.shape) - 1 ]
 
 	# Create the matrices to hold the sums and counts for the transform result values
-	sums = np.zeros((sourceHeight, sourceWidth, resultDimensions), dtype=np.float)
-	counts = np.zeros((sourceHeight, sourceWidth), dtype=np.uint32)
+	sums = np.zeros((sourceHeight, sourceWidth, resultDimensions), dtype=np.float32)
+	counts = np.zeros((sourceHeight, sourceWidth), dtype=np.uint8)
 
 	# Iterate over the batches and apply the transformation function to each batch
 	for windowNum, window in enumerate(windows):
